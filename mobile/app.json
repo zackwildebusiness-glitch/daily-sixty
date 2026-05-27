@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "Daily 60 Goal Planner",
+    "slug": "daily-sixty",
+    "version": "1.0.0",
+    "description": "Daily 60 is an AI goal planner that turns personal goals into focused 60-minute daily actions, streak tracking, and progress plans.",
+    "scheme": "daily60",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.daily60.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png"
+      },
+      "package": "com.daily60.app",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "name": "Daily 60 Goal Planner",
+      "shortName": "Daily 60",
+      "description": "AI goal planner for focused 60-minute daily actions, streak tracking, and progress plans.",
+      "lang": "en",
+      "themeColor": "#6D4AE0"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#6D4AE0"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "996047ec-7932-4212-ba2d-335d3c88901c"
+      }
+    }
+  }
+}

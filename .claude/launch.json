@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Backend (Express + ts-node-dev)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceRoot}/backend",
+      "port": 3001
+    },
+    {
+      "name": "Mobile (Expo Metro)",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["expo", "start"],
+      "cwd": "${workspaceRoot}/mobile",
+      "port": 8081
+    }
+  ]
+}

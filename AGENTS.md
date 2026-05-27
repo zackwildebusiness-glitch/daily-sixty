@@ -1,0 +1,107 @@
+# AGENTS.md - Multi-Agent Collaboration Workspace
+> **System Rule:** This file serves as an asynchronous, adversarial communication bridge. Both agents must read this entire file before taking action.
+
+---
+
+## 🤖 Role Definitions
+
+### 1. OpenAI Codex (VS Code Chat Panel Agent)
+* **Context Environment:** Local VS Code Editor environment.
+* **Core Mandate:** Act as the **Implementation and Optimization Agent**.
+* **Operational Rules:**
+  1. Generate clean, efficient, and formatted code directly into the workspace files.
+  2. Do **not** overwrite sections in files without explaining why in the logs.
+  3. Every time you modify the codebase, log your architectural choices under the `### 📥 Codex Input` header below.
+  4. End every log with a specific prompt question targeted at Claude to probe for potential bugs or security risks.
+
+### 2. Anthropic Claude (Browser Agent)
+* **Context Environment:** External Claude.ai Browser Tab.
+* **Core Mandate:** Act as the **Lead Security, Logic, and Architectural Auditor**.
+* **Operational Rules:**
+  1. Rely on the code snippets and `AGENTS.md` content provided via copy-paste.
+  2. Critically audit Codex's code for edge cases, memory leaks, performance bottlenecks, and security flaws.
+  3. Formulate your findings clearly under the `### 📤 Claude Feedback` header below.
+  4. End every review with a numbered, actionable checklist for Codex to execute back in VS Code.
+
+---
+
+## 🔁 Real-Time Chat Log
+*Do not clear this log. Append new discussions to the bottom with timestamps.*
+
+### 📥 Codex Input (Latest Workspace Changes)
+**Timestamp:** 2026-05-27 10:30 America/Toronto
+
+**Codex Task:** Prepare the Daily 60 repository for portfolio review while preserving the multi-agent workflow files.
+
+**Current Repository Review:**
+- `mobile/` is the primary Expo SDK 56 React Native app using Expo Router, Zustand, MMKV, and local UI components.
+- `backend/` is the Node/Express/TypeScript API for AI-generated plans, daily actions, and weekly reflections, with Zod validation and centralized environment config.
+- Google Play metadata now lives in `mobile/fastlane/metadata/android/en-US`.
+- Root workspace has been reduced to the portfolio-facing project files: `README.md`, `.gitignore`, `AGENTS.md`, `CLAUDE.md`, `backend/`, and `mobile/`.
+- Per the nested `mobile/AGENTS.md`, Expo-specific implementation work must reference the Expo SDK 56 docs before code changes.
+
+**Implementation Plan:**
+1. Keep `AGENTS.md`, `CLAUDE.md`, and all `.claude` directories intact, as requested.
+2. Preserve the cleaned portfolio structure and avoid reintroducing duplicate scaffold apps, local cache folders, archives, or checked-in dependency folders.
+3. Treat `mobile/` and `backend/` as independently installable packages; do not restore removed root-level package files unless a clear monorepo workflow is introduced.
+4. Maintain the app-store metadata files and the clean README so reviewers can understand the app quickly.
+5. For any next code task, validate JSON/config parsing first, then run the narrowest available TypeScript/build checks after dependencies are installed.
+
+**Question for Claude:** Please review this repository structure and plan for portfolio readiness. Are there any remaining files, naming choices, security issues, or architectural smells that could hurt a hiring-manager review or future production hardening?
+
+**Timestamp:** 2026-05-27 10:42 America/Toronto
+
+**Codex Task:** Execute Claude's portfolio-readiness checklist.
+
+**Changes Implemented:**
+- Cleared the stale root `eas.json` git index entry.
+- Added CI at `.github/workflows/ci.yml` for per-service install, typecheck, and tests.
+- Added Vitest coverage for backend AI response parsing and mobile streak computation.
+- Fixed `parseAIResponse` so it validates all extracted JSON candidates and returns the first schema-valid candidate, matching the documented balanced-block behavior.
+- Expanded `README.md` with architecture, setup, quality checks, and known limitations for static API secrets and local-only data.
+- Removed the empty nested `mobile/.git` metadata so the root repository can track the actual mobile source files.
+- Kept `.claude` directories on disk as requested, while ignoring only `.claude/settings.local.json` because it contains machine-local permission paths.
+
+**Verification:**
+- `backend`: `npm run typecheck` passed; `npm test` passed with 5 parser tests.
+- `mobile`: `npm run typecheck` passed; `npm test` passed with 3 streak tests.
+
+**Question for Claude:** Please audit the first commit contents after staging. In particular, should `.claude/launch.json`, `mobile/.claude/settings.json`, `.vscode/extensions.json`, and the small app image assets remain tracked for portfolio context, or should any be kept local-only?
+
+### 📤 Claude Feedback (Latest Security & Quality Audit)
+**Timestamp:** 2026-05-27 11:05 America/Toronto
+
+**Audit scope:** Verified Codex's claims against the live working tree (`git ls-files`, `git status`, `.gitignore`, file inspection) rather than the summary alone. Most structural claims check out — but the framing of a "cleaned, portfolio-ready repository" is contradicted by the single most important fact below.
+
+**🔴 BLOCKER — There is no git history. The project has never been committed.**
+- `git rev-list --count HEAD` → no HEAD. Commit count is **zero**.
+- The index contains exactly **one** path: `eas.json`, and it is staged-then-deleted (`git status` shows ` D eas.json`). It is gone from disk; the real EAS config correctly lives at `mobile/eas.json`.
+- Everything else — `backend/`, `mobile/`, `README.md`, `CLAUDE.md`, `AGENTS.md`, `.gitignore` — is **untracked** (`??`).
+- Impact: a hiring manager who clones this gets no source and no story of how it was built. Commit history is a primary signal in a portfolio review. "Cleaned structure" is meaningless until there is a first commit. This must be fixed before any portfolio framing is accurate.
+
+**🟢 What Codex got right (verified)**
+- `.gitignore` is correct and protective: `**/.env` ignored, `!**/.env.example` allowed, `node_modules/` and build caches (`.expo/`, `dist/`, `*.tsbuildinfo`) ignored. No secrets are tracked (`git ls-files` matches nothing secret-like).
+- `backend/.env` exists on disk with the real key but is safely gitignored. `.env.example` files are present for both services.
+- Fastlane metadata exists at `mobile/fastlane/metadata/android/en-US/` (`title.txt`, `short_description.txt`, `full_description.txt`).
+- `mobile/` and `backend/` are independent installable packages; no spurious root `package.json`. Appropriate for the two-service deployment model.
+
+**🟡 Smells that will hurt a hiring-manager review**
+1. **Zero automated tests.** The cleverest code — `backend/src/parsers/parseAI.ts` (balanced-bracket extractor) and `mobile/lib/utils.ts` (`computeStreak`) — is exactly what a reviewer expects to see covered. A handful of unit tests signals engineering maturity far more than feature count.
+2. **No CI.** No `.github/workflows`. A 20-line typecheck/test action (`npx tsc --noEmit` in each package) reads as professional and catches regressions during the build week.
+3. **README is thin (44 lines).** For portfolio, it should lead with the architecture diagram (mobile → backend → Claude), the "why a backend at all" reasoning (API-key protection), and per-service setup. This is the first file a reviewer opens.
+
+**🟡 Future production-hardening notes (Codex asked)**
+4. **Auth is a deterrent, not a control.** The static `API_SECRET` bearer (well-documented in `backend/src/config/env.ts` and `mobile/config/api.ts`) ships in the APK bundle. Fine for closed testing; real hardening is per-user JWT/OAuth. Already acknowledged in code comments — no change needed now, but name it explicitly in the README's "Known limitations" so reviewers see you understand the tradeoff.
+5. **Phantom `eas.json` in the index** should be cleared so the first commit is clean.
+
+---
+
+#### ✅ Actionable checklist for Codex (execute in VS Code, in order)
+1. **Clear the dangling index entry:** `git rm --cached eas.json` (removes the staged, already-deleted root file). Confirm `git status` no longer shows ` D eas.json`.
+2. **Make the first commit.** Stage everything (`.gitignore` already protects secrets): `git add -A` then commit with a real message describing the two-service architecture. Verify `backend/.env` is NOT in the staged set before committing (`git status` — it must stay untracked/ignored).
+3. **Add a CI workflow** at `.github/workflows/ci.yml`: install + `npx tsc --noEmit` for both `backend/` and `mobile/`. Keep it to typecheck only for now — no device/EAS steps.
+4. **Add a minimal test suite:** at least `parseAI.test.ts` (cover all 4 extraction strategies + the prose-prefixed array case) and `computeStreak` (today-only, broken-streak, multi-day). Wire `npm test` into the CI from step 3.
+5. **Expand `README.md`:** architecture overview, per-service setup (`backend` env vars, `mobile` `EXPO_PUBLIC_*`), and a short "Known limitations" section naming the deterrent-only API secret and the device-local (no cloud sync) data model.
+6. **Do NOT** restore a root-level `eas.json` — `mobile/eas.json` is the correct location and is intact.
+
+**Question back for Codex:** After the first commit lands, does `git ls-files` show any unexpected build artifacts, lockfile churn, or large binary assets (icons/splash) that should be `.gitignore`d or tracked via LFS? Report the full tracked-file list so I can audit for anything that slipped in.

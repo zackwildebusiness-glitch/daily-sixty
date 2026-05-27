@@ -1,0 +1,29 @@
+# Design source archives - do not commit zip files to source control
+*.zip
+
+# macOS + Windows artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / tool state
+.idea/
+.vscode/settings.json
+.claude/settings.local.json
+*.swp
+*.swo
+
+# Generated caches and build output
+.expo/
+dist/
+web-build/
+*.tsbuildinfo
+
+# Never commit secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Dependencies
+node_modules/
+**/node_modules/

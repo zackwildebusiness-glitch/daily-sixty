@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    name: Typecheck and test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service: [backend, mobile]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.x
+          cache: npm
+          cache-dependency-path: ${{ matrix.service }}/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.service }}
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: ${{ matrix.service }}
+        run: npm run typecheck
+
+      - name: Test
+        working-directory: ${{ matrix.service }}
+        run: npm test
