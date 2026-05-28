@@ -11,6 +11,11 @@ import reflectionRouter from './routes/reflection';
 
 const app = express();
 
+// Tell Express to trust the first proxy hop (Railway/Render/Fly pass X-Forwarded-For).
+// Without this, req.ip resolves to the proxy address and every client shares one
+// rate-limit / quota bucket instead of being bucketed by real IP.
+app.set('trust proxy', 1);
+
 // ── Security ──────────────────────────────────────────────────────────────────
 app.use(helmet());
 app.use(cors({ origin: env.clientOrigin }));

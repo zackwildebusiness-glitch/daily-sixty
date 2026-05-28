@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { getTodayAction, adjustAction } from '../services/claude';
+import { aiQuota } from '../middleware/quota';
 
 const router = Router();
 
@@ -33,7 +34,7 @@ router.post('/today', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/adjust', async (req: Request, res: Response) => {
+router.post('/adjust', aiQuota, async (req: Request, res: Response) => {
   const { action, goal, category, type } = req.body;
 
   if (!action   || typeof action   !== 'string' ||

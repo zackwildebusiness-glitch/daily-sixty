@@ -22,6 +22,7 @@ const mmkvStorage: StateStorage = {
 
 interface AppStore {
   // State
+  installId: string;   // stable per-install UUID; survives clearUser; sent as x-user-id
   user: User | null;
   goals: Goal[];
   activeGoalId: string | null;
@@ -65,6 +66,7 @@ const defaultCreateFlow: CreateFlowState = {
 export const useAppStore = create<AppStore>()(
   persist(
     (set, get) => ({
+      installId: crypto.randomUUID(),
       user: null,
       goals: [],
       activeGoalId: null,

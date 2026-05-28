@@ -39,6 +39,20 @@ export const env = {
   clientOrigin:   optional('CLIENT_ORIGIN', '*'),
 
   /**
+   * Postgres connection string for usage-quota + entitlement storage.
+   * Empty = quota system is INERT (middleware passes through). This is the
+   * feature flag: the backend runs identically to before until a DB is set.
+   */
+  databaseUrl:    optional('DATABASE_URL', ''),
+
+  /**
+   * RevenueCat secret API key for server-side entitlement verification
+   * (Phase A: REST lookup by appUserId; Phase B: webhook reconciliation).
+   * Empty = backend treats every user as free tier.
+   */
+  revenueCatApiKey: optional('REVENUECAT_API_KEY', ''),
+
+  /**
    * Static bearer token that mobile clients must send in every request:
    *   Authorization: Bearer <API_SECRET>
    *

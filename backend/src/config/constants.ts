@@ -35,3 +35,16 @@ export const RATE_LIMIT = {
   maxProd:      20,
   maxDev:      100,
 } as const;
+
+/**
+ * Daily AI-generation quota, per user, by entitlement tier.
+ *
+ * Counts only DISCRETIONARY generations (plan creation, action swap/simplify) —
+ * the once-per-day core action is part of the free loop and is not metered here.
+ * Resets daily (UTC). Premium is high enough to feel "unlimited" for real use
+ * while still capping runaway cost from a compromised credential.
+ */
+export const AI_QUOTA = {
+  freeDailyGenerations:    3,
+  premiumDailyGenerations: 50,
+} as const;

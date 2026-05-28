@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { generatePlan } from '../services/claude';
+import { aiQuota } from '../middleware/quota';
 
 const router = Router();
 
@@ -10,7 +11,7 @@ const VALID_SUCCESS    = new Set(['daily','milestone','habit','prove']);
 const sanitize = (s: string, max: number) =>
   String(s).trim().slice(0, max).replace(/[\r\n\t\x00-\x1F\x7F]/g, ' ').trim();
 
-router.post('/generate', async (req: Request, res: Response) => {
+router.post('/generate', aiQuota, async (req: Request, res: Response) => {
   const { goal, category, level, successType } = req.body;
 
   if (!goal || typeof goal !== 'string' || goal.trim().length < 3) {

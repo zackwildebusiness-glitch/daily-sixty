@@ -1,11 +1,13 @@
 import { CategoryId, Step, TodayAction } from '../store/types';
 import { API_BASE_URL, API_PATHS, API_SECRET } from '../config/api';
+import { useAppStore } from '../store';
 
 async function post<T>(path: string, body: object, timeoutMs = 30_000): Promise<T> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (API_SECRET) {
     headers['Authorization'] = `Bearer ${API_SECRET}`;
   }
+  headers['x-user-id'] = useAppStore.getState().installId;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
