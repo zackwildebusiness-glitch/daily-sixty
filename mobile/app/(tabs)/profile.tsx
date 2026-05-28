@@ -71,6 +71,24 @@ export default function ProfileScreen() {
     updateUserPrefs({ notifications: true });
   };
 
+  const handleReminderTimeChange = () => {
+    const times = ['07:00', '08:00', '12:00', '18:00'];
+    Alert.alert(
+      'Daily reminder time',
+      'Choose when Daily 60 should remind you.',
+      [
+        ...times.map((time) => ({
+          text: time,
+          onPress: () => {
+            updateUserPrefs({ reminderTime: time });
+            if (notifications) void scheduleDailyReminder(time);
+          },
+        })),
+        { text: 'Cancel', style: 'cancel' as const },
+      ],
+    );
+  };
+
   const sections: SettingSection[] = [
     {
       title: 'Notifications',
@@ -82,6 +100,12 @@ export default function ProfileScreen() {
           toggle: true,
           on: notifications,
           onToggle: (v) => void handleDailyReminderToggle(v),
+        },
+        {
+          icon: 'clock',
+          label: 'Reminder time',
+          value: user?.reminderTime ?? '08:00',
+          onPress: handleReminderTimeChange,
         },
       ],
     },

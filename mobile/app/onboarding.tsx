@@ -101,7 +101,7 @@ export default function Onboarding() {
   const advance = () => {
     if (isLast) {
       setHasSeenOnboarding();
-      router.replace('/create/category');
+      router.replace('/name');
     } else {
       setSlide((s) => s + 1);
     }
@@ -109,7 +109,7 @@ export default function Onboarding() {
 
   const skip = () => {
     setHasSeenOnboarding();
-    router.replace('/create/category');
+    router.replace('/name');
   };
 
   const s = SLIDES[slide];

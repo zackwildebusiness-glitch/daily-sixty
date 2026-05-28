@@ -133,13 +133,7 @@ export default function TodayScreen() {
       .catch(() => Alert.alert('Could not connect', 'Please try again later.'));
   };
 
-  const handleBell = () => {
-    Alert.alert(
-      'Reminders',
-      'Notification settings are available in the Profile tab.',
-      [{ text: 'OK' }],
-    );
-  };
+  const handleBell = () => router.push('/(tabs)/profile');
 
   if (!activeGoal) {
     return (
