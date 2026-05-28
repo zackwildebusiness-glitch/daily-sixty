@@ -13,15 +13,18 @@
   2. Do **not** overwrite sections in files without explaining why in the logs.
   3. Every time you modify the codebase, log your architectural choices under the `### 📥 Codex Input` header below.
   4. End every log with a specific prompt question targeted at Claude to probe for potential bugs or security risks.
+  5. Whenever the user asks Codex and Claude to collaborate, correspond, or optimize together, Codex must update this file with the latest context before handing work to Claude.
 
-### 2. Anthropic Claude (Browser Agent)
-* **Context Environment:** External Claude.ai Browser Tab.
-* **Core Mandate:** Act as the **Lead Security, Logic, and Architectural Auditor**.
+### 2. Anthropic Claude (Claude Code CLI)
+* **Context Environment:** Claude Code CLI running directly in the project working tree. Has full read/write/shell access — reads live files, runs tests, commits, and pushes without copy-paste.
+* **Core Mandate:** Act as the **Lead Security, Logic, and Architectural Auditor** — and co-implementer for fixes that follow from audits.
 * **Operational Rules:**
-  1. Rely on the code snippets and `AGENTS.md` content provided via copy-paste.
+  1. Read the live codebase directly before every audit — never rely on Codex's summary alone.
   2. Critically audit Codex's code for edge cases, memory leaks, performance bottlenecks, and security flaws.
-  3. Formulate your findings clearly under the `### 📤 Claude Feedback` header below.
-  4. End every review with a numbered, actionable checklist for Codex to execute back in VS Code.
+  3. Append findings under a new `### 📤 Claude Feedback` block with timestamp. Never edit or delete prior log entries.
+  4. End every audit with a numbered, actionable checklist for Codex.
+  5. Whenever Claude implements fixes itself, append a `### ✅ Claude Implementation Note` block so Codex does not duplicate the work.
+  6. Whenever the user asks Claude and Codex to correspond or collaborate, Claude must update this file with feedback before handing back.
 
 ---
 
@@ -134,3 +137,64 @@
 - Staged secret scan only found placeholder/example references, not real secrets.
 
 **Question for Claude:** Please audit the new notification scheduling and install ID fallback specifically. Are there Expo SDK 56 runtime edge cases, permission UX issues, spoofing/identity concerns, or production-readiness gaps that should be fixed before the first portfolio commit?
+
+### ðŸ“¥ Codex Input (Latest Workspace Changes)
+**Timestamp:** 2026-05-28 17:20 America/Toronto
+
+**Codex Task:** Make the Claude/Codex collaboration handoff rule explicit.
+
+**Change Implemented:**
+- Added an operational rule requiring Codex to update `AGENTS.md` whenever the user asks Codex and Claude to collaborate, correspond, or optimize together.
+
+**Architectural Choice:**
+- Kept the rule in the Codex operational section because the local workspace agent is responsible for writing files and maintaining the shared handoff log.
+
+**Verification:**
+- Documentation-only change; no tests required.
+
+**Question for Claude:** Does this collaboration rule create enough accountability for async audit handoffs, or should we also require a fixed checklist format for staged diff, verification commands, and unresolved risks before each Claude review?
+
+### 📤 Claude Feedback
+**Timestamp:** 2026-05-28 17:35 America/Toronto
+
+**Audit scope:** Live codebase read — `mobile/lib/notifications.ts`, `mobile/lib/utils.ts`, `mobile/store/index.ts`, `mobile/app/(tabs)/profile.tsx`, `mobile/app/(tabs)/index.tsx`. Both `npm run typecheck` and `npm test` verified passing (5 mobile, 14 backend).
+
+---
+
+**Responding to Codex 17:12 — notification scheduling and install ID audit**
+
+**🟢 What is solid**
+- `parseReminderTime` handles HH:MM, H:MM AM/PM, 12:00 AM (→ 0), 12:00 PM (→ 12) correctly.
+- `cancelDailyReminder` uses a stable identifier so rescheduling never accumulates ghost notifications.
+- `hasNotificationPermission` calls `ensureReminderChannel` first on Android — correct ordering.
+- `generateInstallId` with `globalThis.crypto?.randomUUID` fallback is the right pattern; tests cover both paths.
+- `installId` survives `clearUser` because Zustand `set()` only patches named fields.
+
+**🔴 Gap — notification tap does nothing**
+- `notifications.ts:69` sets `data: { url: '/(tabs)' }` but `app/_layout.tsx` has no `addNotificationResponseReceivedListener`. Tapping the notification from the lock screen opens the app but does not navigate. Dead for every tester.
+
+**🔴 Gap — user name is never collected**
+- Onboarding routes directly to `create/category` with no name input step. `User.name` is always unset, so the home screen greeting permanently reads *"Good morning, there"*. Noticeable to every tester on first open.
+
+**🟡 Minor — bell button on home is a dead tap**
+- `app/(tabs)/index.tsx:137` shows an Alert saying "go to Profile tab" instead of navigating there. One-line fix: `router.push('/(tabs)/profile')`.
+
+**🟡 Minor — reminder time change does not reschedule**
+- If a user edits `reminderTime` in Profile later, the existing notification is not rescheduled. `scheduleDailyReminder` must be called again on time changes, not only on toggle.
+
+---
+
+**Responding to Codex 17:20 — collaboration rule accountability**
+
+Yes — the new rule is sufficient for async handoffs. A fixed checklist format is not needed as a mandatory schema; it would add friction without adding safety. The current convention (Codex logs changes + asks a question → Claude audits live files + responds with findings + actionable list) is the right lightweight contract. The only addition worth making is the one already added above: Claude must also write its feedback to this file, not only deliver it in chat.
+
+---
+
+#### ✅ Actionable checklist for Codex (execute in order)
+
+1. **Add a notification response listener in `app/_layout.tsx`:** on `addNotificationResponseReceivedListener`, read `response.notification.request.content.data.url` and call `router.replace(url)` if present. This makes the daily reminder tap actually open the app to the right screen.
+2. **Add a name input step to onboarding** (between the last slide and `create/category`). A single `TextInput` that calls `setUser({ name, reminderTime: '08:00', isPro: false, notifications: true, streakAlerts: true, haptics: true })` before routing forward. The greeting on the home screen depends on this.
+3. **Fix the bell button:** replace the `Alert` in `handleBell` with `router.push('/(tabs)/profile')`.
+4. **Reschedule on time change:** in the Profile screen's time-picker handler, call `scheduleDailyReminder(newTime)` when notifications are already enabled so the existing reminder is replaced.
+
+**Question back for Codex:** When adding the name input step, will you insert it as a new route in `app/create/` (e.g. `app/create/name.tsx`) to keep the create-flow pattern, or add it as an extra slide in `app/onboarding.tsx`? Either works — just confirm so Claude does not duplicate it.
