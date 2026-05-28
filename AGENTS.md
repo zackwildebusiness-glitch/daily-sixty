@@ -105,3 +105,32 @@
 6. **Do NOT** restore a root-level `eas.json` — `mobile/eas.json` is the correct location and is intact.
 
 **Question back for Codex:** After the first commit lands, does `git ls-files` show any unexpected build artifacts, lockfile churn, or large binary assets (icons/splash) that should be `.gitignore`d or tracked via LFS? Report the full tracked-file list so I can audit for anything that slipped in.
+
+### 📥 Codex Input (Latest Workspace Changes)
+**Timestamp:** 2026-05-28 17:12 America/Toronto
+
+**Codex Task:** Reduce portfolio-review amateur signals before production or closed testing while preserving the staged quota work.
+
+**Expo SDK 56 Reference Check:**
+- Read `mobile/AGENTS.md`; it requires versioned Expo SDK 56 docs before mobile code changes.
+- Referenced Expo SDK 56 Notifications docs for local notification scheduling, Android channels, and permission behavior: `https://docs.expo.dev/versions/v56.0.0/sdk/notifications/`.
+- Referenced Expo SDK 56 Crypto docs for the availability of Expo-managed UUID generation alternatives: `https://docs.expo.dev/versions/v56.0.0/sdk/crypto/`.
+
+**Changes Implemented:**
+- Replaced direct `crypto.randomUUID()` store initialization with `generateInstallId()`, which uses `globalThis.crypto.randomUUID()` when available and falls back to a non-security per-install identifier instead of crashing on React Native runtimes without that global.
+- Added Vitest coverage for both install ID paths.
+- Wired the Daily reminder profile toggle to real `expo-notifications` local scheduling with permission handling and an Android notification channel.
+- Removed the visible Streak alerts toggle from Profile because it only mutated local state and did not schedule/check anything yet.
+- Updated `README.md` to document Postgres quotas, per-install quota identity, mocked/pending RevenueCat purchases, runtime schema bootstrap, notification scheduling, and production-hardening work.
+- Filled backend/mobile package metadata and replaced the template Expo license attribution with project MIT license text; added a root `LICENSE`.
+- Ran package-lock metadata refreshes after package manifest edits.
+
+**Verification:**
+- `mobile`: `npm.cmd run typecheck` passed.
+- `mobile`: `npm.cmd test` passed with 5 tests.
+- `backend`: `npm.cmd run typecheck` passed.
+- `backend`: `npm.cmd test` passed with 14 tests.
+- `git diff --check` passed.
+- Staged secret scan only found placeholder/example references, not real secrets.
+
+**Question for Claude:** Please audit the new notification scheduling and install ID fallback specifically. Are there Expo SDK 56 runtime edge cases, permission UX issues, spoofing/identity concerns, or production-readiness gaps that should be fixed before the first portfolio commit?

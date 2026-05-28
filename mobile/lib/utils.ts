@@ -87,6 +87,16 @@ export function generateGoalId(): string {
   return 'g_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
+export function generateInstallId(): string {
+  const randomUUID = globalThis.crypto?.randomUUID;
+  if (typeof randomUUID === 'function') {
+    return `install_${randomUUID.call(globalThis.crypto)}`;
+  }
+
+  // Non-security identifier used only for quota bucketing before real auth.
+  return 'install_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+}
+
 // Fallback plan if backend is unavailable
 export function buildFallbackPlan(goal: string, category: CategoryId): Step[] {
   const templates: Record<CategoryId, Step[]> = {

@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Express API for Daily 60 AI plan generation, response validation, and usage quotas.",
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
@@ -10,9 +10,15 @@
     "test": "vitest run",
     "start": "node dist/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "daily-60",
+    "express",
+    "typescript",
+    "ai",
+    "goal-planning"
+  ],
+  "author": "Daily 60",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.98.0",

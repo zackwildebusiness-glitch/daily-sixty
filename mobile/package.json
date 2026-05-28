@@ -1,7 +1,10 @@
 {
   "name": "mobile",
   "version": "1.0.0",
+  "description": "Expo React Native app for Daily 60 goal planning, daily actions, and progress tracking.",
   "main": "expo-router/entry",
+  "license": "MIT",
+  "author": "Daily 60",
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
     "@gorhom/bottom-sheet": "^5.2.14",

@@ -7,6 +7,7 @@ import { useAppStore } from '../../store';
 import { theme } from '../../lib/theme';
 import { useTheme } from '../../lib/ThemeContext';
 import { PALETTE_LIST } from '../../lib/themes';
+import { cancelDailyReminder, scheduleDailyReminder } from '../../lib/notifications';
 import { PurpleBackdrop } from '../../components/PurpleBackdrop';
 import { Card } from '../../components/ui/Card';
 import { Avatar } from '../../components/ui/Avatar';
@@ -36,7 +37,6 @@ export default function ProfileScreen() {
   const t = useTheme();
 
   const notifications = user?.notifications ?? true;
-  const streakAlerts = user?.streakAlerts ?? true;
   const haptics = user?.haptics ?? true;
   const activeThemeId = user?.themeId ?? 'violet';
 
@@ -51,6 +51,26 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleDailyReminderToggle = async (enabled: boolean) => {
+    if (!enabled) {
+      updateUserPrefs({ notifications: false });
+      await cancelDailyReminder();
+      return;
+    }
+
+    const scheduled = await scheduleDailyReminder(user?.reminderTime);
+    if (!scheduled) {
+      Alert.alert(
+        'Notifications disabled',
+        'Enable notifications in system settings to use daily reminders.',
+      );
+      updateUserPrefs({ notifications: false });
+      return;
+    }
+
+    updateUserPrefs({ notifications: true });
+  };
+
   const sections: SettingSection[] = [
     {
       title: 'Notifications',
@@ -61,15 +81,7 @@ export default function ProfileScreen() {
           value: user?.reminderTime ?? '8:00 AM',
           toggle: true,
           on: notifications,
-          onToggle: (v) => updateUserPrefs({ notifications: v }),
-        },
-        {
-          icon: 'flame',
-          label: 'Streak alerts',
-          value: 'Warn before midnight',
-          toggle: true,
-          on: streakAlerts,
-          onToggle: (v) => updateUserPrefs({ streakAlerts: v }),
+          onToggle: (v) => void handleDailyReminderToggle(v),
         },
       ],
     },

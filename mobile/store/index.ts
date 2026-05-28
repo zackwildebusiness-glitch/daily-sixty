@@ -10,7 +10,7 @@ import {
   Step,
   Completion,
 } from './types';
-import { generateGoalId, getToday, computeStreak, shortenName } from '../lib/utils';
+import { generateGoalId, generateInstallId, getToday, computeStreak, shortenName } from '../lib/utils';
 
 const mmkv = createMMKV({ id: 'daily60-store' });
 
@@ -66,7 +66,7 @@ const defaultCreateFlow: CreateFlowState = {
 export const useAppStore = create<AppStore>()(
   persist(
     (set, get) => ({
-      installId: crypto.randomUUID(),
+      installId: generateInstallId(),
       user: null,
       goals: [],
       activeGoalId: null,

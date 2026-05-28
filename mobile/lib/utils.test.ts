@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { computeStreak } from './utils';
+import { computeStreak, generateInstallId } from './utils';
 
 function localDate(daysAgo: number): string {
   const date = new Date();
@@ -35,5 +35,37 @@ describe('computeStreak', () => {
       { date: localDate(1) },
       { date: localDate(2) },
     ])).toBe(3);
+  });
+});
+
+describe('generateInstallId', () => {
+  it('uses the platform UUID API when available', () => {
+    const originalCrypto = globalThis.crypto;
+    Object.defineProperty(globalThis, 'crypto', {
+      configurable: true,
+      value: { randomUUID: () => '00000000-0000-4000-8000-000000000000' },
+    });
+
+    expect(generateInstallId()).toBe('install_00000000-0000-4000-8000-000000000000');
+
+    Object.defineProperty(globalThis, 'crypto', {
+      configurable: true,
+      value: originalCrypto,
+    });
+  });
+
+  it('falls back without crashing when crypto.randomUUID is unavailable', () => {
+    const originalCrypto = globalThis.crypto;
+    Object.defineProperty(globalThis, 'crypto', {
+      configurable: true,
+      value: undefined,
+    });
+
+    expect(generateInstallId()).toMatch(/^install_[a-z0-9]+$/);
+
+    Object.defineProperty(globalThis, 'crypto', {
+      configurable: true,
+      value: originalCrypto,
+    });
   });
 });
