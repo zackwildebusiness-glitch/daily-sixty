@@ -30,7 +30,7 @@ export default function CategoryScreen() {
         )}
       </View>
 
-      <Text style={styles.title}>What do you want{'\n'}to achieve?</Text>
+      <Text style={styles.title}>What do you want to achieve?</Text>
       <Text style={styles.subtitle}>Pick a category to get started.</Text>
 
       <View style={styles.grid}>
@@ -61,21 +61,21 @@ export default function CategoryScreen() {
 
 const styles = StyleSheet.create({
   scroll: { flex: 1, backgroundColor: theme.bg },
-  content: { padding: 22, paddingBottom: 40 },
-  header: { flexDirection: 'row', marginBottom: 8 },
+  content: { padding: 22, paddingTop: 14, paddingBottom: 18, maxWidth: 480, width: '100%', alignSelf: 'center' },
+  header: { flexDirection: 'row', marginBottom: 4 },
   backBtn: {
     width: 40, height: 40, borderRadius: 12,
     backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center',
     shadowColor: '#3C2880', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 1,
   },
-  title: { fontSize: 28, fontWeight: '800', letterSpacing: -1, color: theme.ink, marginBottom: 6 },
-  subtitle: { fontSize: 14, color: theme.inkSoft, marginBottom: 22 },
+  title: { fontSize: 25, fontWeight: '800', letterSpacing: -0.8, color: theme.ink, marginBottom: 4 },
+  subtitle: { fontSize: 14, color: theme.inkSoft, marginBottom: 16 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   card: {
     width: '47%',
-    aspectRatio: 1 / 0.95,
-    borderRadius: 22,
-    padding: 16,
+    height: 118,
+    borderRadius: 20,
+    padding: 14,
     justifyContent: 'space-between',
     overflow: 'hidden',
     shadowColor: '#3C2880',
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.15)',
   },
   iconWrap: {
-    width: 44, height: 44, borderRadius: 14,
+    width: 40, height: 40, borderRadius: 13,
     backgroundColor: 'rgba(255,255,255,0.22)',
     alignItems: 'center', justifyContent: 'center',
   },
