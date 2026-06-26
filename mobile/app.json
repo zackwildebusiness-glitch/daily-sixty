@@ -22,6 +22,7 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
+      "output": "single",
       "favicon": "./assets/favicon.png",
       "name": "Daily 60 Goal Planner",
       "shortName": "Daily 60",

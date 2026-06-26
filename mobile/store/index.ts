@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
-import { createMMKV } from 'react-native-mmkv';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { storage } from './storage';
 import {
   Goal,
   User,
@@ -11,14 +11,6 @@ import {
   Completion,
 } from './types';
 import { generateGoalId, generateInstallId, getToday, computeStreak, shortenName } from '../lib/utils';
-
-const mmkv = createMMKV({ id: 'daily60-store' });
-
-const mmkvStorage: StateStorage = {
-  getItem: (name) => mmkv.getString(name) ?? null,
-  setItem: (name, value) => mmkv.set(name, value),
-  removeItem: (name) => mmkv.remove(name),
-};
 
 interface AppStore {
   // State
@@ -247,7 +239,7 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: 'daily60-app',
-      storage: createJSONStorage(() => mmkvStorage),
+      storage: createJSONStorage(() => storage),
     }
   )
 );
